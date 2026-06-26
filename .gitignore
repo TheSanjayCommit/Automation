@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Environment variables — NEVER commit these (contain private keys & secrets)
+.env
+.env.local
+.env.production
+
+# Build output
+dist/
+build/
+
+# Runtime state (contains Google Sheet ID)
+backend/runtime-config.json
+
+# Uploaded QR images (local only)
+backend/public/uploads/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+*.log

@@ -17,7 +17,8 @@ const __dir = dirname(fileURLToPath(import.meta.url));
 const app   = express();
 const PORT  = process.env.PORT || 4000;
 
-app.use(cors({ origin: process.env.FRONTEND_URL || '*', credentials: true }));
+// Allow any origin — reflects the actual request origin back (works with all Vercel preview URLs too)
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: '20mb' }));
 
 // Serve uploaded QR images as static files

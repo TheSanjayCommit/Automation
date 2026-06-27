@@ -6,6 +6,7 @@ import AdminLogin       from './pages/admin/Login.jsx';
 import StudentLogin     from './pages/student/Login.jsx';
 
 import SheetSetup       from './pages/admin/SheetSetup.jsx';
+import BootcampsManager from './pages/admin/BootcampsManager.jsx';
 import Dashboard        from './pages/admin/Dashboard.jsx';
 import Setup            from './pages/admin/Setup.jsx';
 import CheckIn          from './pages/admin/CheckIn.jsx';
@@ -44,7 +45,8 @@ function AppRoutes() {
 
       {/* Admin */}
       <Route path="/admin/login" element={<AdminLogin />} />
-      <Route path="/admin/sheet-setup"  element={<AdminGuard><SheetSetup /></AdminGuard>} />
+      <Route path="/admin/sheet-setup"     element={<AdminGuard><SheetSetup /></AdminGuard>} />
+      <Route path="/admin/bootcamps"        element={<AdminGuard><BootcampsManager /></AdminGuard>} />
       <Route path="/admin/dashboard"    element={<AdminGuard><Dashboard /></AdminGuard>} />
       <Route path="/admin/setup"        element={<AdminGuard><Setup /></AdminGuard>} />
       <Route path="/admin/checkin"      element={<AdminGuard><CheckIn /></AdminGuard>} />

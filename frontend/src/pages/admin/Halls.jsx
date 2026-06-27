@@ -4,9 +4,9 @@ import { api } from '../../api/client.js';
 
 /**
  * QrField — two modes:
- *  1. Generate from link/text → backend makes a QR PNG, saves as file, returns URL
- *  2. Upload image file       → backend saves the file, returns URL
- * In both cases the Google Sheet stores only a short HTTP URL, never base64.
+ *  1. Generate from link/text → backend generates QR as base64 data URL → stored directly in Sheet
+ *  2. Upload image file       → resized client-side to max 400×400 → stored as base64 data URL in Sheet
+ * Storing data URLs in the Sheet means QR images work everywhere (no server file dependency).
  */
 function QrField({ label, hint, currentUrl, fieldKey, hallName, onSave }) {
   const [mode,    setMode]    = useState('generate');
@@ -19,14 +19,27 @@ function QrField({ label, hint, currentUrl, fieldKey, hallName, onSave }) {
     if (!text.trim()) return;
     setBusy(true); setError('');
     try {
-      // Step 1: generate QR data URL on backend
+      // Generate QR and store the data URL directly — no file upload needed
       const { dataUrl } = await api.generateQr(text.trim());
-      // Step 2: upload the data URL as a real file so the URL is short
-      const filename = `${hallName}_${fieldKey}`.replace(/\s+/g, '_');
-      const { url }  = await api.uploadImage(dataUrl, filename);
-      onSave(url);
+      onSave(dataUrl);
     } catch (e) { setError(e.message); }
     finally { setBusy(false); }
+  }
+
+  function resizeImage(dataUrl, maxSize) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxSize / img.width, maxSize / img.height);
+        const canvas = document.createElement('canvas');
+        canvas.width  = Math.round(img.width  * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/png'));
+      };
+      img.onerror = reject;
+      img.src = dataUrl;
+    });
   }
 
   function handleFile(e) {
@@ -36,9 +49,9 @@ function QrField({ label, hint, currentUrl, fieldKey, hallName, onSave }) {
     const reader = new FileReader();
     reader.onload = async ev => {
       try {
-        const filename = `${hallName}_${fieldKey}`.replace(/\s+/g, '_');
-        const { url } = await api.uploadImage(ev.target.result, filename);
-        onSave(url);
+        // Resize to max 400px so the base64 stays small enough for Google Sheets (~50KB)
+        const dataUrl = await resizeImage(ev.target.result, 400);
+        onSave(dataUrl);
       } catch (err) { setError(err.message); }
       finally { setBusy(false); }
     };
@@ -183,6 +196,11 @@ export default function Halls() {
     <Layout title="Halls & QR Codes">
       {msg   && <div className="alert alert-success">{msg}</div>}
       {error && <div className="alert alert-error">{error}</div>}
+
+      <div className="alert alert-info" style={{ marginBottom: 20 }}>
+        <strong>If QR images are not showing for students:</strong> Re-generate or re-upload the QR codes below.
+        They will now be stored as portable images that work everywhere (no server required).
+      </div>
 
       {halls.length === 0 && (
         <div className="card text-center text-muted">

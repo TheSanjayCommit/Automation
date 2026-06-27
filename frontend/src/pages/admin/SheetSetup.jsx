@@ -3,12 +3,13 @@ import Layout from '../../components/Layout.jsx';
 import { api } from '../../api/client.js';
 
 export default function SheetSetup() {
-  const [status,     setStatus]     = useState(null);
-  const [sheetUrl,   setSheetUrl]   = useState('');
-  const [connecting, setConnecting] = useState(false);
-  const [result,     setResult]     = useState(null);
-  const [error,      setError]      = useState('');
-  const [copied,     setCopied]     = useState(false);
+  const [status,       setStatus]      = useState(null);
+  const [sheetUrl,     setSheetUrl]    = useState('');
+  const [bootcampName, setBootcampName]= useState('');
+  const [connecting,   setConnecting]  = useState(false);
+  const [result,       setResult]      = useState(null);
+  const [error,        setError]       = useState('');
+  const [copied,       setCopied]      = useState(false);
 
   useEffect(() => { loadStatus(); }, []);
 
@@ -21,7 +22,7 @@ export default function SheetSetup() {
     e.preventDefault();
     setError(''); setResult(null); setConnecting(true);
     try {
-      const data = await api.connectSheet({ sheetUrl });
+      const data = await api.connectSheet({ sheetUrl, bootcampName: bootcampName.trim() || undefined });
       setResult(data);
       await loadStatus();
     } catch (e) {
@@ -149,6 +150,17 @@ export default function SheetSetup() {
 
           <form onSubmit={connect}>
             <div className="form-group">
+              <label className="form-label">Bootcamp Name <span style={{ fontWeight: 400, color: 'var(--gray-400)' }}>(students will see this)</span></label>
+              <input
+                className="form-input"
+                placeholder="e.g. NIAT Bootcamp 1"
+                value={bootcampName}
+                onChange={e => setBootcampName(e.target.value)}
+                style={{ fontSize: 14, marginBottom: 10 }}
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Google Sheet URL</label>
               <input
                 className="form-input"
                 placeholder="https://docs.google.com/spreadsheets/d/…"

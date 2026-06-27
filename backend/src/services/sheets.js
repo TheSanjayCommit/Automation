@@ -20,7 +20,7 @@ export const SCHEMA = {
   Halls:        ['id','name','capacity','filled','whatsappQrUrl','wifiQrUrl'],
   Subjects:     ['id','name','instructor'],
   Schedule:     ['id','day','type','startTime','endTime','subject','instructor','hall','notes'],
-  Attendance:   ['id','studentId','studentName','hall','day','session','status','markedAt'],
+  Attendance:   ['id','studentId','studentName','hall','day','session','status','markedAt','mobile'],
   Prerequisites:['id','text'],
   Materials:    ['id','session','type','name','url'],
   Winners:      ['id','session','studentName','prize'],
@@ -86,11 +86,12 @@ function objToRow(tab, obj) {
 
 /**
  * Read all data rows from a tab (skips the header row).
+ * Pass customSheetId to read from an archived/specific sheet instead of the active one.
  */
-export async function readAll(tab) {
+export async function readAll(tab, customSheetId = null) {
   const sheets = getSheetsClient();
   const res = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID(),
+    spreadsheetId: customSheetId || SHEET_ID(),
     range: `${tab}!A:ZZ`,
   });
   const rows = res.data.values || [];
@@ -100,9 +101,10 @@ export async function readAll(tab) {
 
 /**
  * Find the first row where column === value. Returns the record or null.
+ * Pass customSheetId to search in an archived/specific sheet.
  */
-export async function findOne(tab, column, value) {
-  const rows = await readAll(tab);
+export async function findOne(tab, column, value, customSheetId = null) {
+  const rows = await readAll(tab, customSheetId);
   return rows.find(r => r[column] === value) || null;
 }
 
@@ -241,9 +243,10 @@ export async function setConfig(key, value) {
 
 /**
  * Return all config rows as a plain key→value object.
+ * Pass customSheetId to read from an archived/specific sheet.
  */
-export async function getAllConfig() {
-  const rows = await readAll('Config');
+export async function getAllConfig(customSheetId = null) {
+  const rows = await readAll('Config', customSheetId);
   const obj = {};
   rows.forEach(r => { obj[r.key] = r.value; });
   return obj;

@@ -39,7 +39,7 @@ export const api = {
 
   // Auth
   adminLogin:   (password) => api.post('/auth/admin-login', { password }),
-  studentLogin: (otp)      => api.post('/auth/student-login', { otp }),
+  studentLogin: (otp, bootcampId) => api.post('/auth/student-login', { otp, ...(bootcampId ? { bootcampId } : {}) }),
 
   // Admin
   getConfig:      ()      => api.get('/admin/config'),
@@ -101,10 +101,13 @@ export const api = {
   // Upload image file → returns { url } (a real HTTP URL, not base64)
   uploadImage:  (dataUrl, filename) => api.post('/upload', { dataUrl, filename }),
 
-  // Sheet setup (no auth needed for status)
+  // Sheet setup (no auth needed for status / bootcamps)
   getSetupStatus: ()      => api.get('/setup/status'),
-  connectSheet:   (body)  => api.post('/setup/connect', body),
-  disconnectSheet:()      => api.post('/setup/disconnect', {}),
+  getBootcamps:       ()        => api.get('/setup/bootcamps'),
+  getAdminBootcamps:  ()        => api.get('/setup/bootcamps-admin'),
+  updateBootcamp:     (id, b)   => api.put(`/setup/bootcamps/${id}`, b),
+  connectSheet:       (body)    => api.post('/setup/connect', body),
+  disconnectSheet:    ()        => api.post('/setup/disconnect', {}),
 
   // Student
   getMe:              ()      => api.get('/student/me'),

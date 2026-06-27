@@ -15,19 +15,22 @@ export default function Landing() {
     <div className="landing">
       <div className="landing-logo">🎓</div>
       <h1>NIAT Bootcamp</h1>
-      <p>Bootcamp Management System</p>
+      <p>All-in-one bootcamp management portal</p>
+
       <div className="landing-cards">
         <div className="landing-card" onClick={() => navigate('/student/login')}>
           <div className="lc-icon">🎒</div>
           <h3>I'm a Student</h3>
-          <p>Login with your OTP</p>
+          <p>Access schedule, attendance & materials</p>
         </div>
         <div className="landing-card" onClick={() => navigate('/admin/login')}>
           <div className="lc-icon">🛠️</div>
           <h3>BOA / Admin</h3>
-          <p>Operations staff login</p>
+          <p>Manage check-ins, QR codes & reports</p>
         </div>
       </div>
+
+      <p className="landing-footer">NIAT Bootcamp System &nbsp;·&nbsp; Powered by Google Sheets</p>
     </div>
   );
 }
